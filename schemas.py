@@ -4,7 +4,6 @@ class WorkoutSet(BaseModel):
     exercise_name: str
     weight: float
     reps: int
-    user_id: int
 
 class UserCreate(BaseModel):
     email: str
@@ -24,3 +23,7 @@ class WorkoutResponse(WorkoutSet):
 
 class UserWithWorkouts(UserResponse):
     workouts: list[WorkoutResponse] = []    
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

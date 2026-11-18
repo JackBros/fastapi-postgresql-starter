@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 from models import DBUser
-from schemas import UserCreate, UserResponse, UserWithWorkouts
+from schemas import UserCreate, UserResponse, UserWithWorkouts, Token
+from auth import create_access_token
 
 router = APIRouter(
     prefix="/users",
@@ -40,9 +41,8 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         )
     return user
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 def login_user(user_credentials: UserCreate, db: Session = Depends(get_db)):
-    # 1. Kontrol: Kullanıcı var mı?
     user = db.query(DBUser).filter(DBUser.email == user_credentials.email).first()
     if not user:
         raise HTTPException(
@@ -50,7 +50,6 @@ def login_user(user_credentials: UserCreate, db: Session = Depends(get_db)):
             detail="E-posta veya şifre hatalı."
         )
 
-    # 2. Kontrol: Şifre doğru mu?
     is_valid = bcrypt.checkpw(
         user_credentials.password.encode("utf-8"),
         user.hashed_password.encode("utf-8")
@@ -61,4 +60,5 @@ def login_user(user_credentials: UserCreate, db: Session = Depends(get_db)):
             detail="E-posta veya şifre hatalı."
         )
 
-    return {"message": "Giriş başarılı", "user_id": user.id}
+    access_token = create_access_token(data={"sub": str(user.id)})
+    return {"access_token": access_token, "token_type": "bearer"}
