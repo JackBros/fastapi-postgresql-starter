@@ -39,3 +39,26 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
             detail="Kullanıcı bulunamadı."
         )
     return user
+
+@router.post("/login")
+def login_user(user_credentials: UserCreate, db: Session = Depends(get_db)):
+    # 1. Kontrol: Kullanıcı var mı?
+    user = db.query(DBUser).filter(DBUser.email == user_credentials.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="E-posta veya şifre hatalı."
+        )
+
+    # 2. Kontrol: Şifre doğru mu?
+    is_valid = bcrypt.checkpw(
+        user_credentials.password.encode("utf-8"),
+        user.hashed_password.encode("utf-8")
+    )
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="E-posta veya şifre hatalı."
+        )
+
+    return {"message": "Giriş başarılı", "user_id": user.id}
