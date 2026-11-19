@@ -16,3 +16,6 @@ app.add_middleware(
 
 app.include_router(workouts.router)
 app.include_router(users.router)
+@app.get("/")
+def root():
+    return {"status": "ok", "message": "Workout API is running"}
