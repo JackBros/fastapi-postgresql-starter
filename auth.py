@@ -3,6 +3,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from jwt.exceptions import InvalidTokenError
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 SECRET_KEY = "cok-gizli-gelistirme-anahtari-degistirilecek"
 ALGORITHM = "HS256"
