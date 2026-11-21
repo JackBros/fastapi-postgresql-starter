@@ -4,6 +4,7 @@ anyio==4.16.0
 bcrypt==5.0.0
 click==8.5.1
 fastapi==0.162.7
+google-genai
 h11==0.16.0
 idna==3.20
 opentelemetry-api==1.45.2

@@ -10,6 +10,7 @@ router = APIRouter(
     tags=["Workouts"]
 )
 
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_workout(
     workout: WorkoutSet,
@@ -20,6 +21,7 @@ def create_workout(
         exercise_name=workout.exercise_name,
         weight=workout.weight,
         reps=workout.reps,
+        muscle_group=workout.muscle_group,
         user_id=current_user_id
     )
     db.add(new_workout)
@@ -27,12 +29,14 @@ def create_workout(
     db.refresh(new_workout)
     return new_workout
 
+
 @router.get("/")
 def get_workouts(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user_id)
 ):
     return db.query(DBWorkout).filter(DBWorkout.user_id == current_user_id).all()
+
 
 @router.put("/{workout_id}")
 def update_workout(
@@ -56,6 +60,8 @@ def update_workout(
     db_workout.exercise_name = workout.exercise_name
     db_workout.weight = workout.weight
     db_workout.reps = workout.reps
+    if "muscle_group" in workout.model_fields_set:
+        db_workout.muscle_group = workout.muscle_group
 
     db.commit()
     db.refresh(db_workout)
